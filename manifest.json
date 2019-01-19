@@ -1,0 +1,19 @@
+{
+    "name" : "Find Replace",
+    "host" : {
+      "app" : "XD",
+      "minVersion" : "13.0.0"
+    },
+    "description" : "A plugin for find and replacing text",
+    "id" : "8597506e",
+    "uiEntryPoints" : [ {
+      "label" : "Find and Replace",
+      "type" : "menu",
+      "commandId" : "findAndReplace",
+      "shortcut": {
+          "mac": "Cmd+Shift+R",
+          "win": "Ctrl+Shift+R"
+      }
+    } ],
+    "version" : "1.0.0"
+  }
