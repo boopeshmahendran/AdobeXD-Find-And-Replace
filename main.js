@@ -1,6 +1,12 @@
 const { Text } = require("scenegraph");
 const { error } = require("./lib/dialogs.js");
 
+/**
+ * Creates and show the find and replace dialog UI
+ * 
+ * @returns {Promise} Resolves to an object of form {which, values}. `which` indicates which button
+ * was pressed. `values` is an object containing the values of the form.
+ */
 async function showFindAndReplaceDialog() {
     let buttons = [
         { label: "Cancel", variant: "primary" },
@@ -125,6 +131,44 @@ async function showFindAndReplaceDialog() {
     }
 }
 
+/**
+ * Recursively replaces all occurences of findText with replaceText in the entire scengraph tree
+ * starting at rootNode
+ * 
+ * @param {!SceneNode} rootNode Root node of the scenegraph
+ * @param {!RegExp} findText Regex Object for matching findText
+ * @param {!string} replaceText Text to be replaced
+ */
+function replaceAll(rootNode, findText, replaceText) {
+    if (!rootNode.isContainer) return 0;
+
+    let noOfOccurences = 0;
+    const replacer = function () {
+        noOfOccurences++;
+        return replaceText;
+    }
+
+    rootNode.children.forEach(node => {
+        if (node instanceof Text) {
+            if (node.name === node.text) {
+                node.name = node.text = node.text.replace(findText, replacer);
+            } else {
+                node.text = node.text.replace(findText, replacer);
+            }
+        } else if (node.isContainer) {
+            noOfOccurences += replaceAll(node, findText, replaceText);
+        }
+    });
+
+    return noOfOccurences;
+}
+
+/**
+ * Entry point for the plugin
+ * 
+ * @param {!Selection} selection
+ * @param {!SceneNode} documentRoot
+ */
 async function findAndReplace(selection, documentRoot) {
     const response = await showFindAndReplaceDialog();
 
@@ -171,30 +215,6 @@ async function findAndReplace(selection, documentRoot) {
             await error("Error", "No occurences of findText found");
         }
     }
-}
-
-function replaceAll(rootNode, findText, replaceText) {
-    if (!rootNode.isContainer) return 0;
-
-    let noOfOccurences = 0;
-    const replacer = function () {
-        noOfOccurences++;
-        return replaceText;
-    }
-
-    rootNode.children.forEach(node => {
-        if (node instanceof Text) {
-            if (node.name === node.text) {
-                node.name = node.text = node.text.replace(findText, replacer);
-            } else {
-                node.text = node.text.replace(findText, replacer);
-            }
-        } else if (node.isContainer) {
-            noOfOccurences += replaceAll(node, findText, replaceText);
-        }
-    });
-
-    return noOfOccurences;
 }
 
 module.exports.commands = {
