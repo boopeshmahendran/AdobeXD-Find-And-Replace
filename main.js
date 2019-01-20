@@ -41,6 +41,9 @@ async function showFindAndReplaceDialog() {
         overflow-y: auto;
         height: auto;
     }
+    .row {
+        align-items: center;
+    }
 </style>
 <form method="dialog">
     <h1 class="h1">
